@@ -1,2 +1,2 @@
-# Hello-World
-Repository with code for students to test their OpenGL installation. 
+# AmongUs-2D-OpenGL
+Among Us game made in OpenGL2D

@@ -38,7 +38,7 @@ Over::Over(float x, float y) {
         1,-1,0,
 
     };
-    this->object[2] = create3DObject(GL_LINES, 2*2, vertex_buffer_data2, COLOR_YELLOW, GL_FILL);
+    this->object[2] = create3DObject(GL_LINES, 2*2, vertex_buffer_data3, COLOR_YELLOW, GL_FILL);
 
 
 }

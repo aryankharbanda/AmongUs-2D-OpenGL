@@ -278,6 +278,10 @@ bool move_playa(float x1, float y1){
     }
     hud.position.x += x1;
     hud.position.y += y1;
+
+    over.position.x += x1;
+    over.position.y += y1;
+
     return true;
 }
 
@@ -299,11 +303,16 @@ void tick_elements() {
     
     glUniform1i(lightID, light);
     
+    eye_x = playa.position.x;
+    eye_y = playa.position.y;
+    tar_x = playa.position.x;
+    tar_y = playa.position.y;
+
     if(!gameover){
-        eye_x = playa.position.x;
-        eye_y = playa.position.y;
-        tar_x = playa.position.x;
-        tar_y = playa.position.y;
+        // eye_x = playa.position.x;
+        // eye_y = playa.position.y;
+        // tar_x = playa.position.x;
+        // tar_y = playa.position.y;
 
         player_bb.x = playa.position.x;
         player_bb.y = playa.position.y;
@@ -387,7 +396,7 @@ void tick_elements() {
         }
 
         // cout << score << endl;
-        if(detect_collision(imposter_bb,player_bb)){
+        if(detect_collision(imposter_bb,player_bb)&&(!imposter.vanish)){
             gameover = true;
         }
 
@@ -408,6 +417,51 @@ void tick_elements() {
 
 }
 
+bool checkbt1col(){
+    bounding_box_t temp;
+    temp.width = (1.732*btnimp.len/2);
+    temp.height = (1.732*btnimp.len/2);
+    temp.x = btnimp.position.x;
+    temp.y = btnimp.position.y;
+    for(int i=0; i<num_bbox;i++){
+        if(detect_collision(temp,bb_bb[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkbt2col(){
+    bounding_box_t temp;
+    temp.width = (1.732*btnobs.len/2);
+    temp.height = (1.732*btnobs.len/2);
+    temp.x = btnobs.position.x;
+    temp.y = btnobs.position.y;
+    for(int i=0; i<num_bbox;i++){
+        if(detect_collision(temp,bb_bb[i])){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkimpcol(){
+    bool ans = false;
+    bounding_box_t temp;
+    temp.width = 2/(imposter.zoom_fac);
+    temp.height = 2/(imposter.zoom_fac);
+    temp.x = imposter.position.x;
+    temp.y = imposter.position.y;
+
+    for(int i=0; i<num_bbox;i++){
+        if(detect_collision(temp,bb_bb[i])){
+            ans = true;
+        }
+    }
+    cout << ans <<endl;
+    return ans;
+}
+
 
 /* Initialize the OpenGL rendering properties */
 /* Add all the models to be created here */
@@ -418,10 +472,14 @@ void initGL(GLFWwindow *window, int width, int height) {
     // scorr = Score(0,0);
     hi = Hi(0,0);
     hud = Hud(-11,-11);
-    over = Over(0,0);
+    // over = Over(0,0);
+    over = Over(-11, -11);
 
     playa       = Ball(-11, -11, COLOR_BLUE);
-    imposter    = Imposter(-11, -5, COLOR_RED);
+    // imposter    = Imposter(-11, -5, COLOR_RED);
+    imposter    = Imposter((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12, COLOR_RED);
+    
+
     maze        = Maze(0, 0);
     // v2 = (float)rand()%400/100 + 4;
     bbox[0]     = Bbox((float)(rand()%400)/100 + 4, (float)(rand()%400)/100 + 4);
@@ -433,11 +491,24 @@ void initGL(GLFWwindow *window, int width, int height) {
     bbox[6]     = Bbox((float)(rand()%400)/100 + 4, (float)(rand()%400)/100 - 12);
     bbox[7]     = Bbox((float)(rand()%400)/100 - 4, (float)(rand()%400)/100 - 12);
     // bbox[8]     = Bbox((float)(rand()%400)/100 - 12, (float)(rand()%400)/100 - 12);
+
+    // check impcoll after setting blackboxes
+    while(checkimpcol()!=false){
+        cout << "a";
+        imposter.set_position((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12);
+    }
     
     // btnimp      = Btn(-11,-8, COLOR_ORANGE);
     // btnobs      = Btn(-11,-6, COLOR_SEAGREEN);
     btnimp      = Btn((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12, COLOR_ORANGE);
     btnobs      = Btn((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12, COLOR_SEAGREEN);
+
+    while(checkbt1col()!=false){
+        btnimp.set_position((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12);
+    }
+    while(checkbt2col()!=false){
+        btnobs.set_position((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12);
+    }
 
     for(int i=0; i<num_coins;i++){
         coins[i]    = Coin((float)(rand()%2400)/100 -12, (float)(rand()%2400)/100 -12);
